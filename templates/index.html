@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eye & Brightness Detection</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        var socket = io.connect("http://127.0.0.1:5000");
+
+        socket.on("eye_state", function(data) {
+            document.getElementById("eye-status").innerText = "Eye State: " + data.state;
+            document.getElementById("brightness-status").innerText = "Brightness: " + data.brightness;
+            var eyeImage = document.getElementById("eye-image");
+
+            // Change image based on eye state
+            if (data.state == "No Faces Found"){
+                eyeImage.src = "no_face.png";
+            }else if (data.state == "Closed" && data.brightness != "Dark") {
+                eyeImage.src = "closed_eye.png";
+            }else if (data.state == "Open" && data.brightness == "Dark") {
+                eyeImage.src = "dark_open_eye.png";
+            }else if (data.state == "Closed" && data.brightness == "Dark") {
+                eyeImage.src = "dark_closed_eye.png";
+            }else{
+                eyeImage.src = "open_eye.png";
+            }
+
+            // Change background color based on brightness
+            if (data.brightness == "Dark") {
+                document.body.style.backgroundColor = "black";
+                document.body.style.color = "white"; // Adjust text color for dark mode
+            } else {
+                document.body.style.backgroundColor = "white";
+                document.body.style.color = "black"; // Adjust text color for light mode
+            }
+        });
+    </script>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        #eye-image {
+            display: block;
+            margin: 20px auto;
+            width: 50%;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Useless Useful Machine</h1>
+    <h2 id="eye-status">Eye State: Loading...</h2>
+    <h2 id="brightness-status">Brightness: Loading...</h2>
+    <img id="eye-image" src="closed_eye.png" alt="Eye State">
+</body>
+</html>
